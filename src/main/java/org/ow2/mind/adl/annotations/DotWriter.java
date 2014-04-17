@@ -20,7 +20,7 @@ import org.ow2.mind.adl.ast.Component;
 import org.ow2.mind.adl.ast.DefinitionReference;
 import org.ow2.mind.adl.ast.MindInterface;
 import org.ow2.mind.adl.ast.Source;
-import org.ow2.mind.adl.implementation.BasicImplementationLocator;
+import org.ow2.mind.adl.implementation.ImplementationLocator;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -93,7 +93,7 @@ public class DotWriter {
 	
 	@Inject
 	@Named(DUMP_DOT)
-	public BasicImplementationLocator implementationLocatorItf;
+	public ImplementationLocator implementationLocatorItf;
 	
 	@Inject
 	Loader adlLoaderItf;
