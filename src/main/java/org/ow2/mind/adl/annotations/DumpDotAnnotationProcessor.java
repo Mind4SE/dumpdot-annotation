@@ -48,6 +48,7 @@ import org.ow2.mind.io.BasicOutputFileLocator;
 import org.ow2.mind.adl.annotations.DotWriter;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 
 /**
@@ -55,10 +56,16 @@ import com.google.inject.Inject;
  */
 public class DumpDotAnnotationProcessor extends
 AbstractADLLoaderAnnotationProcessor {
-	
+
+	/*
+	 * Works because our Loader is itself loaded by Google Guice.
+	 */
+	@Inject
+	Injector injector;
+
 	@Inject 
 	protected IDLLoader idlLoaderItf; 
-	
+
 	private Map<Object,Object> context;
 	private String buildDir;
 
@@ -68,7 +75,7 @@ AbstractADLLoaderAnnotationProcessor {
 		for (int i = 0; i < subComponents.length; i++) {
 			currentDot.addSubComponent(subComponents[i]);
 		}
-		
+
 		TreeSet<Binding> bindings = new TreeSet<Binding>( new BindingComparator() );
 		for ( Binding binding: ((BindingContainer) definition).getBindings() ) {
 			bindings.add(binding);
@@ -76,7 +83,7 @@ AbstractADLLoaderAnnotationProcessor {
 		for (Binding binding : bindings) {
 			currentDot.addBinding(binding);
 		}
-		
+
 		for (int i = 0; i < subComponents.length; i++) {
 			final Component subComponent = subComponents[i];
 			showComponents(subComponent, instanceName);
@@ -86,11 +93,11 @@ AbstractADLLoaderAnnotationProcessor {
 
 	private void showPrimitive(final Definition definition, String instanceName, DotWriter currentDot) {
 		final Source[] sources = ((ImplementationContainer) definition).getSources();
-		
+
 		for (int i = 0; i < sources.length; i++) {
 			currentDot.addSource(sources[i]);
 		}
-		
+
 	}	
 
 	private void showComponents(final Component component, String instanceName) {
@@ -100,12 +107,13 @@ AbstractADLLoaderAnnotationProcessor {
 					.getDefinitionReference(), null, null);
 			instanceName = instanceName + "." + component.getName();
 
-			DotWriter currentDot = new DotWriter(buildDir, instanceName, component, context);
+			DotWriter currentDot = injector.getInstance(DotWriter.class); 
+			currentDot.init(buildDir, instanceName, component, context);
 
 			TreeSet<MindInterface> interfaces = new TreeSet<MindInterface>(new MindInterfaceComparator());
 			for (Interface itf : ((InterfaceContainer) definition).getInterfaces())
 				interfaces.add((MindInterface) itf); 
-			
+
 			for (MindInterface itf : interfaces) {
 				String itfSource = idlLoaderItf.load(itf.getSignature(), context).astGetSource();
 				int i = itfSource.lastIndexOf(":");
@@ -119,7 +127,7 @@ AbstractADLLoaderAnnotationProcessor {
 					currentDot.addClient(itf.getName(), itfSource);
 				}
 			}
-			
+
 			if (ASTHelper.isComposite(definition)) {
 				showComposite(definition, instanceName, currentDot);
 			} else if (ASTHelper.isPrimitive(definition)) {
@@ -146,20 +154,25 @@ AbstractADLLoaderAnnotationProcessor {
 	 */
 	public Definition processAnnotation(final Annotation annotation,
 			final Node node, final Definition definition,
-			final ADLLoaderPhase phase, final Map<Object, Object> cont)
+			final ADLLoaderPhase phase, final Map<Object, Object> context)
 					throws ADLException {
 		assert annotation instanceof DumpDot;
-		context = cont;
+		this.context = context;
 
 		String topLevelName = "TopLevel"; //FIXME get the executable name.
 
 		buildDir = ((File) context.get(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY)).getPath() +  File.separator;
-		DotWriter topDot = new DotWriter(buildDir, topLevelName, null, cont);
+
+		// Get instance from the injector so its @Inject fields get properly injected (ADL Loader especially)
+		DotWriter topDot = injector.getInstance(DotWriter.class);
+		topDot.init(buildDir, topLevelName, null, context);
+
 		if (ASTHelper.isComposite(definition)) {
 			showComposite(definition, topLevelName, topDot);
 		} else if (ASTHelper.isPrimitive(definition)) {
 			showPrimitive(definition, topLevelName, topDot);
 		}
+		
 		topDot.close();
 		return null;
 	}

@@ -4,28 +4,30 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Map;
 import java.util.TreeSet;
 
+import org.objectweb.fractal.adl.ADLException;
+import org.objectweb.fractal.adl.Definition;
+import org.objectweb.fractal.adl.Loader;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
+import org.objectweb.fractal.adl.types.TypeInterface;
 import org.ow2.mind.adl.ast.ASTHelper;
+import org.ow2.mind.adl.ast.Binding;
 import org.ow2.mind.adl.ast.Component;
 import org.ow2.mind.adl.ast.DefinitionReference;
 import org.ow2.mind.adl.ast.MindInterface;
 import org.ow2.mind.adl.ast.Source;
-import org.objectweb.fractal.adl.ADLException;
-import org.objectweb.fractal.adl.Definition;
-import org.ow2.mind.adl.ast.Binding;
 import org.ow2.mind.adl.implementation.BasicImplementationLocator;
-import org.objectweb.fractal.adl.types.TypeInterface;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 
 public class DotWriter {
-	//public static final String            DUMP_DOT = "DumpDot";
+	
 	/**
 	 * The PrintWriter that will be used for all code generation of this component.
 	 */
@@ -84,9 +86,17 @@ public class DotWriter {
 	private int color=1;
 	private Map<Object, Object> context;
 
-	//@Inject
-	//@Named(DUMP_DOT)
-	public BasicImplementationLocator implementationLocatorItf = new BasicImplementationLocator();
+	/**
+	 * Key used for Named Google Guice binding
+	 */
+	public static final String DUMP_DOT = "DumpDot";
+	
+	@Inject
+	@Named(DUMP_DOT)
+	public BasicImplementationLocator implementationLocatorItf;
+	
+	@Inject
+	Loader adlLoaderItf;
 	
 	/**
 	 * Initialize the DotWriter with the associated instance info 
@@ -95,8 +105,8 @@ public class DotWriter {
 	 * @param component The "type" of the component
 	 * @param cont the context
 	 */
-	public DotWriter(String dir, String name, Component component, Map<Object, Object> cont) {
-		context=cont;
+	public void init(String dir, String name, Component component, Map<Object, Object> context) {
+		this.context = context;
 		try {
 			compName = name;
 			final int i = name.lastIndexOf('.');
@@ -112,7 +122,7 @@ public class DotWriter {
 			if (component!=null)
 				try {
 					//get adlSource in the form /absolute/path/comp.adl:[line,column]-[line,column]
-					adlSource = ASTHelper.getResolvedDefinition(component.getDefinitionReference(),null,null).astGetSource();
+					adlSource = ASTHelper.getResolvedDefinition(component.getDefinitionReference(), adlLoaderItf, context).astGetSource();
 					//removing line information. (using lastIndexOf instead of split[0] as ":" is a valid path character)
 					adlSource = adlSource.substring(0,adlSource.lastIndexOf(":"));
 				} catch (ADLException e) {
@@ -153,7 +163,7 @@ public class DotWriter {
 			int clientItf = 0;
 			int serverItf = 0;
 			DefinitionReference defRef = component.getDefinitionReference();
-			final Definition definition = ASTHelper.getResolvedDefinition(defRef, null, null);
+			final Definition definition = ASTHelper.getResolvedDefinition(defRef, adlLoaderItf, context);
 			currentPrinter.print(component.getName() + "Comp [URL=\"" + compName + "." + component.getName() + ".gv\",shape=Mrecord,style=filled,fillcolor=lightgrey,label=\"" + component.getName() + " | {{ " );
 			if (definition instanceof InterfaceContainer) {
 
@@ -277,4 +287,5 @@ public class DotWriter {
 		currentPrinter.println("}");
 		currentPrinter.close();
 	}
+
 }
