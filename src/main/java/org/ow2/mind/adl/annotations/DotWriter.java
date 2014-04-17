@@ -111,7 +111,10 @@ public class DotWriter {
 			String adlSource = null;
 			if (component!=null)
 				try {
-					adlSource = ASTHelper.getResolvedDefinition(component.getDefinitionReference(),null,null).astGetSource().split(":")[0];
+					//get adlSource in the form /absolute/path/comp.adl:[line,column]-[line,column]
+					adlSource = ASTHelper.getResolvedDefinition(component.getDefinitionReference(),null,null).astGetSource();
+					//removing line information. (using lastIndexOf instead of split[0] as ":" is a valid path character)
+					adlSource = adlSource.substring(0,adlSource.lastIndexOf(":"));
 				} catch (ADLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
