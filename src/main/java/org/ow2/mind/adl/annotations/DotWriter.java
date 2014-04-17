@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -215,7 +213,7 @@ public class DotWriter {
 			to = "Clt" + ti;
 		else
 			to = tc + "Comp:" + ti;
-		currentPrinter.println( from + "->" + to + "[tailport=e headport=w colorscheme=\"paired12\" color=" + color + "];");	
+		currentPrinter.println( from + "->" + to + "[colorscheme=\"paired12\" color=" + color + "];");	
 	}
 
 	/**
