@@ -225,7 +225,7 @@ public class DotWriter {
 			to = "Clt" + ti;
 		else
 			to = tc + "Comp:" + ti;
-		currentPrinter.println( from + "->" + to + "[tailport=e headport=w colorscheme=\"paired12\" color=" + color + "];");	
+		currentPrinter.println( from + "->" + to + "[colorscheme=\"paired12\" color=" + color + "];");	
 	}
 
 	/**
