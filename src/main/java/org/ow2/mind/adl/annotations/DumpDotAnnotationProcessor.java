@@ -28,6 +28,7 @@ import java.util.TreeSet;
 
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
+import org.objectweb.fractal.adl.Loader;
 import org.objectweb.fractal.adl.Node;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
@@ -61,10 +62,13 @@ AbstractADLLoaderAnnotationProcessor {
 	 * Works because our Loader is itself loaded by Google Guice.
 	 */
 	@Inject
-	Injector injector;
+	protected Injector injector;
 
 	@Inject 
-	protected IDLLoader idlLoaderItf; 
+	protected IDLLoader idlLoaderItf;
+	
+	@Inject
+	protected Loader adlLoaderItf;
 
 	private Map<Object,Object> context;
 	private String buildDir;
@@ -104,7 +108,7 @@ AbstractADLLoaderAnnotationProcessor {
 
 		try {
 			final Definition definition = ASTHelper.getResolvedDefinition(component
-					.getDefinitionReference(), null, null);
+					.getDefinitionReference(), adlLoaderItf, context);
 			instanceName = instanceName + "." + component.getName();
 
 			DotWriter currentDot = injector.getInstance(DotWriter.class); 
