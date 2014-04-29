@@ -201,7 +201,7 @@ public class DotWriter {
 				//			for (int i = 0; i < interfaces.length; i++) {
 				//				final MindInterface itf = (MindInterface) interfaces[i];
 				for (MindInterface itf : interfaces) {
-					if (itf.getRole()==TypeInterface.SERVER_ROLE) {
+					if (itf.getRole().equals(TypeInterface.SERVER_ROLE)) {
 						if ( serverItf !=0 ) currentPrinter.print(" | ");
 						currentPrinter.print("<" + itf.getName() + "> " + itf.getName());
 						serverItf++;
@@ -212,7 +212,7 @@ public class DotWriter {
 				//			for (int i = 0; i < interfaces.length; i++) {
 				//				final MindInterface itf = (MindInterface) interfaces[i];	
 				for (MindInterface itf : interfaces) {	
-					if (itf.getRole()==TypeInterface.CLIENT_ROLE) {
+					if (itf.getRole().equals(TypeInterface.CLIENT_ROLE)) {
 						if ( clientItf !=0 ) currentPrinter.print(" | ");
 						currentPrinter.print("<" + itf.getName() + "> " + itf.getName());
 						clientItf++;
@@ -243,12 +243,12 @@ public class DotWriter {
 		String ti = binding.getToInterface();
 		String from = null;
 		String to = null;
-		if (fc == "this")
+		if (fc.equals("this"))
 			from = "Srv" + fi;
 		else
 			from = fc + "Comp:" + fi;
 
-		if (tc == "this") 
+		if (tc.equals("this")) 
 			to = "Clt" + ti;
 		else
 			to = tc + "Comp:" + ti;
