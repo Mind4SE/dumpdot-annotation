@@ -124,10 +124,10 @@ AbstractADLLoaderAnnotationProcessor {
 				itfSource = itfSource.substring(0,i);
 				File itfFile=new File(itfSource);
 				itfSource = itfFile.getAbsolutePath();
-				if (itf.getRole()==TypeInterface.SERVER_ROLE) {
+				if (itf.getRole().equals(TypeInterface.SERVER_ROLE)) {
 					currentDot.addServer(itf.getName(), itfSource);
 				}
-				if (itf.getRole()==TypeInterface.CLIENT_ROLE) {
+				if (itf.getRole().equals(TypeInterface.CLIENT_ROLE)) {
 					currentDot.addClient(itf.getName(), itfSource);
 				}
 			}
