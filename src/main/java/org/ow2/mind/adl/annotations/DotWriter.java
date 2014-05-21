@@ -49,7 +49,7 @@ import com.google.inject.name.Named;
 
 
 public class DotWriter {
-	
+
 	/**
 	 * The PrintWriter that will be used for all code generation of this component.
 	 */
@@ -112,14 +112,14 @@ public class DotWriter {
 	 * Key used for Named Google Guice binding
 	 */
 	public static final String DUMP_DOT = "DumpDot";
-	
+
 	@Inject
 	@Named(DUMP_DOT)
 	public ImplementationLocator implementationLocatorItf;
-	
+
 	@Inject
 	Loader adlLoaderItf;
-	
+
 	/**
 	 * Initialize the DotWriter with the associated instance info 
 	 * @param dir the build directory for the output file
@@ -146,11 +146,14 @@ public class DotWriter {
 					//get adlSource in the form /absolute/path/comp.adl:[line,column]-[line,column]
 					adlSource = ASTHelper.getResolvedDefinition(component.getDefinitionReference(), adlLoaderItf, context).astGetSource();
 					//removing line information. (using lastIndexOf instead of split[0] as ":" is a valid path character)
-					if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
-						adlSource = adlSource.substring(1,adlSource.lastIndexOf(":"));
-					} else {
-						//Somehow windows paths come here with an extra "/" in front of the Drive letter.
-						adlSource = adlSource.substring(0,adlSource.lastIndexOf(":"));
+					if (adlSource != null) // Do  not test os if the source is null 
+					{
+						if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+							adlSource = adlSource.substring(1,adlSource.lastIndexOf(":"));
+						} else {
+							//Somehow windows paths come here with an extra "/" in front of the Drive letter.
+							adlSource = adlSource.substring(0,adlSource.lastIndexOf(":"));
+						}
 					}
 				} catch (ADLException e) {
 					// TODO Auto-generated catch block
@@ -280,7 +283,7 @@ public class DotWriter {
 		srvItfs=srvItfs + "Srv" + itfName + " [shape=Mrecord,style=filled,fillcolor=red,label=\"" + itfName + "\", URL=\"" + itfURI + "\", height=1 ];";
 		srvItfsNb++;
 	}
-	
+
 	/**
 	 * Add a client interface to the graphviz source code.
 	 * @param itfName : the name of the interface instance (as on the "requires" line in ADL)
