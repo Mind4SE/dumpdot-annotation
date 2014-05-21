@@ -146,11 +146,14 @@ public class DotWriter {
 					//get adlSource in the form /absolute/path/comp.adl:[line,column]-[line,column]
 					adlSource = ASTHelper.getResolvedDefinition(component.getDefinitionReference(), adlLoaderItf, context).astGetSource();
 					//removing line information. (using lastIndexOf instead of split[0] as ":" is a valid path character)
-					if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
-						adlSource = adlSource.substring(1,adlSource.lastIndexOf(":"));
-					} else {
-						//Somehow windows paths come here with an extra "/" in front of the Drive letter.
-						adlSource = adlSource.substring(0,adlSource.lastIndexOf(":"));
+					if (adlSource != null) // Do  not test os if the source is null 
+					{
+    					if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+    						adlSource = adlSource.substring(1,adlSource.lastIndexOf(":"));
+    					} else {
+    						//Somehow windows paths come here with an extra "/" in front of the Drive letter.
+    						adlSource = adlSource.substring(0,adlSource.lastIndexOf(":"));
+    					}
 					}
 				} catch (ADLException e) {
 					// TODO Auto-generated catch block
