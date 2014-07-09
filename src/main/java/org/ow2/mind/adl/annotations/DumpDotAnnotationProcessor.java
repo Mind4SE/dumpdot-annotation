@@ -47,6 +47,7 @@ import org.ow2.mind.annotation.Annotation;
 import org.ow2.mind.idl.IDLLoader;
 import org.ow2.mind.io.BasicOutputFileLocator;
 import org.ow2.mind.adl.annotations.DotWriter;
+import org.ow2.mind.compilation.CompilerContextHelper;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -163,6 +164,8 @@ AbstractADLLoaderAnnotationProcessor {
 		assert annotation instanceof DumpDot;
 		this.context = context;
 
+		logger.info("Graph generator: Start creating .gv files...");
+		
 		String topLevelName = "TopLevel"; //FIXME get the executable name.
 
 		buildDir = ((File) context.get(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY)).getPath() +  File.separator;
@@ -178,6 +181,9 @@ AbstractADLLoaderAnnotationProcessor {
 		}
 		
 		topDot.close();
+		
+		logger.info("Graph generator: Finished.");
+		
 		return null;
 	}
 
